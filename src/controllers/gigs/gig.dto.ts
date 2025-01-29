@@ -4,7 +4,7 @@ export const getGigsDto = z.object({
   lat: z.string(),
   lng: z.string(),
   maxDistance: z.string(),
-  skills: z.number().array(),
+  skills: z.string().array(),
 });
 
 export type IGetGigsDto = z.infer<typeof getGigsDto>;
