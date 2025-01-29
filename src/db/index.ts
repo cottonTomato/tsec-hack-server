@@ -3,7 +3,6 @@ export {
   users,
   userRoles,
   gigs,
-  gigTypes,
   gigApplications,
   gigApplicationStatus,
   dailyGigApplicationTrack,
