@@ -16,11 +16,7 @@ import {
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 
-export const userRoles = pgEnum('user_roles', [
-  'worker',
-  'employer',
-  'company',
-]);
+export const userRoles = pgEnum('user_roles', ['worker', 'company']);
 
 export const users = pgTable(
   'users',
@@ -29,7 +25,7 @@ export const users = pgTable(
     name: varchar('name', { length: 50 }).notNull(),
     phone: varchar('phone', { length: 10 }).unique().notNull(),
     companyDetail: text('company_detail'),
-    role: userRoles('role'),
+    role: userRoles('role').notNull(),
     averageRating: doublePrecision('average_rating').default(0),
     ratingCount: integer('rating_count').default(0),
     image: varchar('photo'),
@@ -44,7 +40,7 @@ export const workerTypes = pgTable('worker_types', {
   id: serial('id').primaryKey(),
   name: varchar('worker_type_name').unique().notNull(),
   isActive: boolean('is_active').default(true),
-  createAt: timestamp('created_at').defaultNow(),
+  createdAt: timestamp('created_at').defaultNow(),
 });
 
 export const wokerExpertise = pgTable('worker_expertise', {

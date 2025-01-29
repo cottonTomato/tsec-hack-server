@@ -1,5 +1,4 @@
 import type { RequestHandler, ErrorRequestHandler } from 'express';
-import type { AuthObject } from '@clerk/express';
 
 type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
@@ -12,10 +11,18 @@ type ReqHandler<TReqBody> = RequestHandler<
 >;
 type ErrHandler = ErrorRequestHandler<object, AckResponse, object, object>;
 
+declare module 'jsonwebtoken' {
+  interface JwtPayload {
+    userId: number;
+  }
+}
+
 declare global {
   namespace Express {
     interface Request {
-      auth: AuthObject;
+      user: {
+        userId: number;
+      };
     }
   }
 }

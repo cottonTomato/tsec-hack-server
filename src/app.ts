@@ -3,7 +3,6 @@ import 'express-async-errors';
 import { createServer } from 'http';
 import cors from 'cors';
 import helmet from 'helmet';
-import { clerkMiddleware } from '@clerk/express';
 
 import { port, allowedOrigin } from './common/config';
 import {
@@ -11,6 +10,8 @@ import {
   notFoundHandler,
   globalErrorHandler,
 } from './middlewares';
+import './services/authentication.service';
+import { authRouter, workerRouter } from './controllers';
 
 const app = express();
 const httpServer = createServer(app);
@@ -28,6 +29,9 @@ app.use(accessLogger);
 app.get('/', (_req, res) => {
   res.send('<h1>Hello, World</h1>');
 });
+
+app.use('/auth', authRouter);
+app.use('/worker', workerRouter);
 
 app.use(notFoundHandler);
 app.use(globalErrorHandler);
