@@ -133,3 +133,35 @@ export const sendWorkersList = async (phone_no_id: Number, from: Number, service
         throw new Error('Error sending message');
     }
 };
+
+export const welcome = async (phone_no_id: Number, from: Number) => {
+    const workerTypeList = await db.select({id: workerTypes.id, title: workerTypes.name}).from(workerTypes).limit(5);
+    try {
+        const response = await fetch('https://graph.facebook.com/v21.0/'+phone_no_id+'/messages', {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer EAAMfn42vpUMBO3IJk2CbhtEyfzOSVPy8T8p1ZCEQ0U467jmPVBB2ktZANbTFsl33kkrpDYPIUZAcWL8HZC4NgVDY5zkZCUYsCCWWZBZBsWfG7BNcozfuuTLNZCptY5qCp8JuIZCtnRqZBBiCRHvwICQnnzV6UQwCEZAk2ZAymLQXNtnleG31GQ0yNmZCOc7DrKZANKZC9d3dqRWeCC3aqDvYAJrreYBuTmaX3uwBOdz7B3wBQh0',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                messaging_product: 'whatsapp',
+                to: from,
+                type: 'text',
+                text: {
+                    "preview_url": false,
+                    "body": "Hello! Welcome to Rozgaar Connect! We could not find any ongoing jobs posted by you. Find a worker for your job by replying with 'Find'",
+                }
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to send message');
+        }
+
+        const data = await response.json();
+        // console.log('Response from Facebook API: \n', JSON.stringify(data, null, 2));
+    } catch (error) {
+        console.error('Error sending message:', error);
+        throw new Error('Error sending message');
+    }
+};

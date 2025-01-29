@@ -1,11 +1,11 @@
 import { Router } from 'express';
-import { sendServices, askLocation, sendWorkersList } from './webhook.controller';
+import { sendServices, askLocation, sendWorkersList, welcome } from './webhook.controller';
 import { getCompany } from './webhook.auth';
 
 export const webhookRouter = Router();
 
 let serviceName="Carpenter";
-let currentState = "services"
+let currentState = "initial";
 const gig = {};
 
 const myToken = 'real';
@@ -45,9 +45,11 @@ webhookRouter.post('/', async (req, res) => {
                 try {
                     sendWorkersList(phone_no_id, from, 12);
                     res.status(200).send('Message sent');
+
                     setTimeout(() => {
-                        currentState = "services";
+                        currentState = "initial";
                     }, 15000);
+
                     return;
                 } catch (error) {
                     console.error('Error sending message:', error);
@@ -74,6 +76,17 @@ webhookRouter.post('/', async (req, res) => {
                 try {
                     sendServices(phone_no_id, from);
                     currentState = "location";
+                    res.status(200).send('Message sent');
+                } catch (error) {
+                    console.error('Error sending message:', error);
+                    res.status(500).send('Error sending message');
+                }
+            }
+
+            if (currentState === "initial") {
+                try {
+                    welcome(phone_no_id, from);
+                    currentState = "services";
                     res.status(200).send('Message sent');
                 } catch (error) {
                     console.error('Error sending message:', error);
