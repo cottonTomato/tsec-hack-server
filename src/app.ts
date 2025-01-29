@@ -11,7 +11,12 @@ import {
   globalErrorHandler,
 } from './middlewares';
 import './services/authentication.service';
-import { authRouter, workerRouter } from './controllers';
+import {
+  authRouter,
+  webhookRouter,
+  workerRouter,
+  gigsRouter,
+} from './controllers';
 
 const app = express();
 const httpServer = createServer(app);
@@ -32,6 +37,8 @@ app.get('/', (_req, res) => {
 
 app.use('/auth', authRouter);
 app.use('/worker', workerRouter);
+app.use('/webhook', webhookRouter);
+app.use('/gigs', gigsRouter);
 
 app.use(notFoundHandler);
 app.use(globalErrorHandler);
