@@ -32,6 +32,7 @@ app.use(
 app.use(accessLogger);
 
 app.get('/', (_req, res) => {
+  console.log(_req.body);
   res.send('<h1>Hello, World</h1>');
 });
 

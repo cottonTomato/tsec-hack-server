@@ -19,7 +19,7 @@ export const getGigs: ReqHandler<IGetGigsDto> = async function (req, res) {
       images: gigs.images,
       distance: sql<number>`
         6731 * acos(
-          cos(radian(${lat})) * cos(radian(${gigs.lat})) * 
+          cos(radians(${lat})) * cos(radians(${gigs.lat})) * 
           cos(radians(${lng}) - radians(${gigs.lng})) + 
           sin(radians(${lat})) * sin(radians(${gigs.lat}))
         )`.as('distance'),
@@ -30,7 +30,7 @@ export const getGigs: ReqHandler<IGetGigsDto> = async function (req, res) {
     .where(
       and(
         sql`6731 * acos(
-          cos(radian(${lat})) * cos(radian(${gigs.lat})) * 
+          cos(radians(${lat})) * cos(radians(${gigs.lat})) * 
           cos(radians(${lng}) - radians(${gigs.lng})) + 
           sin(radians(${lat})) * sin(radians(${gigs.lat}))) < ${maxDistance}`,
         inArray(gigs.workerType, skills)

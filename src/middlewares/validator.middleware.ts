@@ -7,7 +7,7 @@ export function validatorFactory<T>(schema: Schema<T>) {
     const result = schema.safeParse(req.body);
 
     if (!result.success) {
-      const problems = result.error.errors.map((error) => error.path.join('.'));
+      const problems = result.error.errors.map((error) => error.message);
 
       throw new BadRequest('Invalid Input', { problems });
     }

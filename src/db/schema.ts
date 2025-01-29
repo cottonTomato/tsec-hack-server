@@ -3,7 +3,6 @@ import {
   serial,
   text,
   timestamp,
-  time,
   boolean,
   check,
   integer,
@@ -28,7 +27,7 @@ export const users = pgTable(
     role: userRoles('role').notNull(),
     averageRating: doublePrecision('average_rating').default(0),
     ratingCount: integer('rating_count').default(0),
-    image: varchar('photo'),
+    photo: varchar('photo'),
   },
   (user) => [
     index('role_idx').on(user.role),
@@ -48,8 +47,6 @@ export const wokerExpertise = pgTable('worker_expertise', {
   workerTypeId: serial('worker_type_id').references(() => workerTypes.id),
 });
 
-export const gigTypes = pgEnum('gig_types', ['random', 'fixed']);
-
 export const gigs = pgTable(
   'gig',
   {
@@ -62,11 +59,8 @@ export const gigs = pgTable(
     lng: doublePrecision('lng').notNull(),
     payPerDay: integer('pay_per_day').notNull(),
     images: json('images').$type<string[]>(),
-    gigType: gigTypes('gig_type').notNull(),
     startDate: date('start_date').notNull().defaultNow(),
     endDate: date('end_date').notNull(),
-    startTime: time('start_time'),
-    endTime: time('end_time'),
     createdAt: timestamp('created_at').defaultNow(),
   },
   (gig) => [

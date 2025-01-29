@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
 export const getGigsDto = z.object({
-  lat: z.number(),
-  lng: z.number(),
-  maxDistance: z.number(),
+  lat: z.string(),
+  lng: z.string(),
+  maxDistance: z.string(),
   skills: z.number().array(),
 });
 
