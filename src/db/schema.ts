@@ -63,7 +63,7 @@ export const gigs = pgTable(
     payPerDay: integer('pay_per_day').notNull(),
     images: json('images').$type<string[]>(),
     gigType: gigTypes('gig_type').notNull(),
-    startDate: date('start_date').defaultNow(),
+    startDate: date('start_date').notNull().defaultNow(),
     endDate: date('end_date').notNull(),
     startTime: time('start_time'),
     endTime: time('end_time'),

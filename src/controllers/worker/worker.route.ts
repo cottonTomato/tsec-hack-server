@@ -1,6 +1,7 @@
 import { Router } from 'express';
-import { getWorkerTypes } from './worker.controller';
+import { getWorkerTypes, getWorker } from './worker.controller';
 
 export const workerRouter = Router();
 
 workerRouter.get('/types', getWorkerTypes);
+workerRouter.get('/phone', getWorker);
