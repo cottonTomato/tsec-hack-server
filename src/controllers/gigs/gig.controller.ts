@@ -1,6 +1,6 @@
 import { StatusCodes } from 'http-status-codes';
 import { ReqHandler } from '../../types';
-import { IGetGigsDto, IAddGigDto } from './gig.dto';
+import { IGetGigsDto, IAddGigDto, IApplyForGigsDto } from './gig.dto';
 import { mapboxKey } from '../../common/config';
 import {
   db,
@@ -23,6 +23,47 @@ interface MapboxResponse {
     };
   }>;
 }
+
+export const applyForGig: ReqHandler<IApplyForGigsDto> = async function (
+  req,
+  res
+) {
+  const { gigId } = req.body;
+  const userId = req.user.userId;
+
+  const existingApplication = await db
+    .select()
+    .from(gigApplications)
+    .where(
+      and(
+        eq(gigApplications.workerId, userId),
+        eq(gigApplications.gigId, gigId)
+      )
+    )
+    .limit(1);
+
+  if (existingApplication.length > 0) {
+    res.status(StatusCodes.CONFLICT).json({
+      status: 'Failure',
+    });
+    return;
+  }
+
+  const [newApplication] = await db
+    .insert(gigApplications)
+    .values({
+      workerId: userId,
+      gigId,
+      status: 'applied',
+      appliedAt: new Date(),
+    })
+    .returning();
+
+  res.status(StatusCodes.CREATED).json({
+    status: 'Success',
+    data: newApplication,
+  });
+};
 
 export const getGigs: ReqHandler<IGetGigsDto> = async function (req, res) {
   const { lat, lng, maxDistance, skills } = req.body;
@@ -55,7 +96,7 @@ export const getGigs: ReqHandler<IGetGigsDto> = async function (req, res) {
           cos(radians(${lat})) * cos(radians(${gigs.lat})) * 
           cos(radians(${lng}) - radians(${gigs.lng})) + 
           sin(radians(${lat})) * sin(radians(${gigs.lat}))) < ${maxDistance}`,
-        inArray(workerTypes.name, skills)
+        inArray(workerTypes.id, skills)
       )
     )
     .orderBy(sql`distance`);
