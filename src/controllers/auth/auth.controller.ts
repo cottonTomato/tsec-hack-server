@@ -65,7 +65,7 @@ export const sendOtp: ReqHandler<ISendOTPDto> = async function (req, res) {
   const client = getTwilioClient();
 
   const verification = await client.verify.v2
-    .services('VAaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+    .services('VAe37c7238245866b1436703aee8c72151')
     .verifications.create({
       channel: 'sms',
       to: '+91' + phonenumber,
@@ -83,7 +83,7 @@ export const verifyOtp: ReqHandler<IVerifyOTPDto> = async function (req, res) {
   const client = getTwilioClient();
 
   const verificationCheck = await client.verify.v2
-    .services('VAaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+    .services('VAe37c7238245866b1436703aee8c72151')
     .verificationChecks.create({
       code,
       to: '+91' + phonenumber,
