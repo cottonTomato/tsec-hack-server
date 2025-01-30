@@ -18,10 +18,10 @@ export const sendServices = async (phone_no_id: Number, from: Number) => {
                     type: 'list',
                     header: {
                         type: 'text',
-                        text: 'What Service Do You Require?',
+                        text: '🔧 What Service Do You Require?',
                     },
                     body: {
-                        text: 'Problem Domain',
+                        text: 'Please select a service from the list below:',
                     },
                     action: {
                         button: 'Services Offered',
@@ -63,7 +63,7 @@ export const askLocation = async (phone_no_id: Number, from: Number) => {
                 interactive: {
                     type: 'location_request_message',
                     body: {
-                        text: 'Share the Location Of the Gig',
+                        text: '📍 Please share the location of the gig.',
                     },
                     action: {
                         name: 'send_location'
@@ -88,7 +88,7 @@ export const askLocation = async (phone_no_id: Number, from: Number) => {
 export const sendWorkersList = async (phone_no_id: Number, from: Number, serviceId: Number) => {
     try {
         const workerTypeList = await db.select({id: workerTypes.id, title: workerTypes.name}).from(workerTypes).limit(5);
-        const workersList = await db.select({id: users.id, title: users.name, description: sql<string>`'Call: ' || ${users.phone} || ' (Rating: ' || ${users.averageRating} || ')'`}).from(users).where(eq(users.role, 'worker')).limit(5);
+        const workersList = await db.select({id: users.id, title: users.name, description: sql<string>`'📞 Call: ' || ${users.phone} || ' ⭐ (Rating: ' || ${users.averageRating} || ')'`}).from(users).where(eq(users.role, 'worker')).limit(5);
         console.log(workersList);
         const response = await fetch('https://graph.facebook.com/v21.0/'+phone_no_id+'/messages', {
             method: 'POST',
@@ -104,10 +104,10 @@ export const sendWorkersList = async (phone_no_id: Number, from: Number, service
                     type: 'list',
                     header: {
                         type: 'text',
-                        text: 'Here are the skilled workers near you',
+                        text: '👷 Here are the skilled workers near you:',
                     },
                     body: {
-                        text: 'hello',
+                        text: 'Please select a worker from the list below:',
                     },
                     action: {
                         button: 'Workers Found',
@@ -140,17 +140,17 @@ export const welcome = async (phone_no_id: Number, from: Number) => {
         const response = await fetch('https://graph.facebook.com/v21.0/'+phone_no_id+'/messages', {
             method: 'POST',
             headers: {
-                'Authorization': 'Bearer EAAMfn42vpUMBO3IJk2CbhtEyfzOSVPy8T8p1ZCEQ0U467jmPVBB2ktZANbTFsl33kkrpDYPIUZAcWL8HZC4NgVDY5zkZCUYsCCWWZBZBsWfG7BNcozfuuTLNZCptY5qCp8JuIZCtnRqZBBiCRHvwICQnnzV6UQwCEZAk2ZAymLQXNtnleG31GQ0yNmZCOc7DrKZANKZC9d3dqRWeCC3aqDvYAJrreYBuTmaX3uwBOdz7B3wBQh0',
-                'Content-Type': 'application/json'
+            'Authorization': 'Bearer EAAMfn42vpUMBO3IJk2CbhtEyfzOSVPy8T8p1ZCEQ0U467jmPVBB2ktZANbTFsl33kkrpDYPIUZAcWL8HZC4NgVDY5zkZCUYsCCWWZBZBsWfG7BNcozfuuTLNZCptY5qCp8JuIZCtnRqZBBiCRHvwICQnnzV6UQwCEZAk2ZAymLQXNtnleG31GQ0yNmZCOc7DrKZANKZC9d3dqRWeCC3aqDvYAJrreYBuTmaX3uwBOdz7B3wBQh0',
+            'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                messaging_product: 'whatsapp',
-                to: from,
-                type: 'text',
-                text: {
-                    "preview_url": false,
-                    "body": "Hello! Welcome to Rozgaar Connect! We could not find any ongoing jobs posted by you. Find a worker for your job by replying with 'Find'",
-                }
+            messaging_product: 'whatsapp',
+            to: from,
+            type: 'text',
+            text: {
+                "preview_url": false,
+                "body": "👋 Hello! Welcome to Rozgaar Connect! 🌟 We couldn't find any ongoing jobs posted by you. 🚀 Find a worker for your job by replying with 'Find'. 🔍",
+            }
             })
         });
 
