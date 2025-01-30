@@ -12,7 +12,6 @@ export type IGetGigsDto = z.infer<typeof getGigsDto>;
 export const addGigDto = z.object({
   title: z.string().min(3).max(50),
   description: z.string().optional(),
-  employerId: z.number().int().positive(),
   workerType: z.number().int().positive(),
   lat: z.number(),
   lng: z.number(),

@@ -101,33 +101,38 @@ export const getGigs: ReqHandler<IGetGigsDto> = async function (req, res) {
     )
     .orderBy(sql`distance`);
 
-  const locationGigList = gigList.map(async (gig) => {
-    const response = await fetch(
-      `https://api.mapbox.com/geocoding/v6/reverse?longitude=${gig.location.lng}&latitude=${gig.location.lat}?access_token=${mapboxKey}&types=place,locality,region`
-    );
-    const data = (await response.json()) as MapboxResponse;
-    const context = data.features[0].properties.context;
+  const locationGigList = await Promise.all(
+    gigList.map(async (gig) => {
+      const response = await fetch(
+        `https://api.mapbox.com/search/geocode/v6/reverse?longitude=${gig.location.lng}&latitude=${gig.location.lat}&access_token=${mapboxKey}&types=place,locality,region`
+      );
+      const data = (await response.json()) as MapboxResponse;
+      const context = data.features[0].properties.context;
 
-    const locality = context['locality']?.name;
-    const place = context['place']?.name;
-    const district = context['district']?.name;
-    return {
-      ...gig,
-      location: {
-        locality: locality ?? 'Not available',
-        district: district ?? 'Not available',
-        place: place ?? 'Not available',
-      },
-    };
-  });
+      const locality = context['locality']?.name;
+      const place = context['place']?.name;
+      const district = context['district']?.name;
+      return {
+        ...gig,
+        location: {
+          locality: locality ?? 'Not available',
+          district: district ?? 'Not available',
+          place: place ?? 'Not available',
+        },
+      };
+    })
+  );
 
   res.status(StatusCodes.OK).json({ status: 'Success', data: locationGigList });
 };
 
 export const addGig: ReqHandler<IAddGigDto> = async function (req, res) {
+  const employerId = Math.random() * 9 + 1;
+  // const workerType = Math.random() *
   const [newGig] = await db
     .insert(gigs)
     .values({
+      employerId,
       ...req.body,
     })
     .returning();
