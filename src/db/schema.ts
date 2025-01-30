@@ -108,7 +108,7 @@ export const gigApplications = pgTable(
 
 export const dailyGigApplicationStatus = pgEnum(
   'daily_gig_application_status',
-  ['present', 'absent', 'paid']
+  ['present', 'absent', 'paid', 'overdue']
 );
 
 export const dailyGigApplicationTrack = pgTable(

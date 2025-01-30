@@ -1,9 +1,16 @@
 import { StatusCodes } from 'http-status-codes';
 import { ReqHandler } from '../../types';
-import { IGetGigsDto } from './gig.dto';
+import { IGetGigsDto, IAddGigDto } from './gig.dto';
 import { mapboxKey } from '../../common/config';
-import { db, gigs, users, workerTypes } from '../../db';
-import { eq, sql, and, inArray } from 'drizzle-orm';
+import {
+  db,
+  gigs,
+  users,
+  workerTypes,
+  gigApplications,
+  dailyGigApplicationTrack,
+} from '../../db';
+import { eq, sql, and, inArray, desc, gte } from 'drizzle-orm';
 
 interface MapboxResponse {
   features: Array<{
@@ -76,12 +83,83 @@ export const getGigs: ReqHandler<IGetGigsDto> = async function (req, res) {
   res.status(StatusCodes.OK).json({ status: 'Success', data: locationGigList });
 };
 
-export const addGig: ReqHandler<object> = function (req, res) {
-  // const {} = req.body;
+export const addGig: ReqHandler<IAddGigDto> = async function (req, res) {
+  const [newGig] = await db
+    .insert(gigs)
+    .values({
+      ...req.body,
+    })
+    .returning();
 
-  res.status(StatusCodes.OK).json({ status: 'Success' });
+  res.status(StatusCodes.CREATED).json({ status: 'Success', data: newGig });
 };
 
-export const getCurrentGigs: ReqHandler<object> = function (req, res) {};
+const getCurrentDateString = function () {
+  return new Date().toISOString().replace('T', ' ').replace('Z', '');
+};
 
-export const getPastGigs: ReqHandler<object> = function (req, res) {};
+export const getCurrentGigs: ReqHandler<object> = async function (_req, res) {
+  const currentDate = getCurrentDateString();
+  const ongoingGigs = await db
+    .select({
+      title: gigs.title,
+      description: gigs.description,
+      employer: users.name,
+      employerImage: users.photo,
+      status: dailyGigApplicationTrack.status,
+      payPerDay: gigs.payPerDay,
+      endDate: gigs.endDate,
+    })
+    .from(gigApplications)
+    .innerJoin(gigs, eq(gigApplications.gigId, gigs.id))
+    .leftJoin(
+      dailyGigApplicationTrack,
+      and(
+        eq(gigApplications.id, dailyGigApplicationTrack.gigApplicationId),
+        eq(dailyGigApplicationTrack.date, currentDate)
+      )
+    )
+    .leftJoin(users, eq(users.id, gigs.employerId))
+    .where(eq(gigApplications.status, 'progressing'))
+    .orderBy(desc(gigApplications.appliedAt));
+
+  res.status(StatusCodes.OK).json({
+    status: 'Success',
+    data: ongoingGigs,
+  });
+};
+
+export const getPastGigs: ReqHandler<object> = async function (_req, res) {
+  const currentDate = getCurrentDateString();
+
+  const pastGigs = await db
+    .select({
+      title: gigs.title,
+      description: gigs.description,
+      employer: users.name,
+      employerImage: users.photo,
+      status: dailyGigApplicationTrack.status,
+      endDate: gigs.endDate,
+    })
+    .from(gigApplications)
+    .innerJoin(gigs, eq(gigApplications.gigId, gigs.id))
+    .leftJoin(
+      dailyGigApplicationTrack,
+      and(
+        eq(gigApplications.id, dailyGigApplicationTrack.gigApplicationId),
+        gte(dailyGigApplicationTrack.date, currentDate)
+      )
+    )
+    .where(
+      and(
+        eq(gigApplications.status, 'completed'),
+        eq(gigApplications.status, 'cancelled')
+      )
+    )
+    .orderBy(desc(gigApplications.appliedAt));
+
+  res.status(StatusCodes.OK).json({
+    status: 'Success',
+    data: pastGigs,
+  });
+};

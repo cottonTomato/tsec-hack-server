@@ -1,9 +1,15 @@
 import { ReqHandler } from '../../types';
 import { StatusCodes } from 'http-status-codes';
-import type { IRegisterEmployerDto, IRegisterEmployeeDto } from './auth.dto';
+import type {
+  IRegisterEmployerDto,
+  IRegisterEmployeeDto,
+  ISendOTPDto,
+  IVerifyOTPDto,
+} from './auth.dto';
 import jwt from 'jsonwebtoken';
 import { jwtTokenSecret, jwtTokenLifetime } from '../../common/config';
 import { db, users, wokerExpertise } from '../../db';
+import { getTwilioClient } from '../../services/sms.service';
 
 export const registerEmployer: ReqHandler<IRegisterEmployerDto> =
   async function (req, res) {
@@ -53,3 +59,39 @@ export const registerEmployee: ReqHandler<IRegisterEmployeeDto> =
       .status(StatusCodes.CREATED)
       .json({ status: 'Success', data: { token } });
   };
+
+export const sendOtp: ReqHandler<ISendOTPDto> = async function (req, res) {
+  const { phonenumber } = req.body;
+  const client = getTwilioClient();
+
+  const verification = await client.verify.v2
+    .services('VAaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+    .verifications.create({
+      channel: 'sms',
+      to: '+91' + phonenumber,
+    });
+
+  if (verification.status == 'approved') {
+    res.status(StatusCodes.OK).json({ status: 'Success' });
+    return;
+  }
+  res.status(StatusCodes.UNPROCESSABLE_ENTITY).json({ status: 'Failure' });
+};
+
+export const verifyOtp: ReqHandler<IVerifyOTPDto> = async function (req, res) {
+  const { code, phonenumber } = req.body;
+  const client = getTwilioClient();
+
+  const verificationCheck = await client.verify.v2
+    .services('VAaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+    .verificationChecks.create({
+      code,
+      to: '+91' + phonenumber,
+    });
+
+  if (verificationCheck.status == 'approved') {
+    res.status(StatusCodes.OK).json({ status: 'Success' });
+    return;
+  }
+  res.status(StatusCodes.UNPROCESSABLE_ENTITY).json({ status: 'Failure' });
+};

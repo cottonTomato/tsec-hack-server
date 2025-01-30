@@ -13,6 +13,8 @@ export const databaseURI =
 export const clerkKey = process.env.CLERK_SECRET_KEY;
 export const clerkPublishKey = process.env.CLERK_PUBLISHABLE_KEY;
 export const mapboxKey = process.env.MAPBOX_SECRET_KEY;
+export const twilioAccountSid = process.env.TWILIO_ACCOUNT_SID;
+export const twilioKey = process.env.TWILIO_AUTH_KEY;
 
 // Security
 export const allowedOrigin = process.env.ALLOWED_ORIGIN ?? '*';

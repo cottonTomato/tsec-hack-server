@@ -1,0 +1,1 @@
+ALTER TYPE "public"."daily_gig_application_status" ADD VALUE 'overdue';

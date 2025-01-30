@@ -10,4 +10,5 @@ export {
   ratings,
   workerTypes,
   wokerExpertise,
+  otpRequests,
 } from './schema';
