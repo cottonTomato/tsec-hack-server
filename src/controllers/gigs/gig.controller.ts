@@ -107,7 +107,18 @@ export const getGigs: ReqHandler<IGetGigsDto> = async function (req, res) {
         `https://api.mapbox.com/search/geocode/v6/reverse?longitude=${gig.location.lng}&latitude=${gig.location.lat}&access_token=${mapboxKey}&types=place,locality,region`
       );
       const data = (await response.json()) as MapboxResponse;
-      const context = data.features[0].properties.context;
+      const context = data?.features?.[0]?.properties?.context;
+
+      if (!context) {
+        return {
+          ...gig,
+          location: {
+            locality: 'Not available',
+            district: 'Not available',
+            place: 'Not available',
+          },
+        };
+      }
 
       const locality = context['locality']?.name;
       const place = context['place']?.name;
